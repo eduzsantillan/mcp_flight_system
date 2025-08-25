@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passengers | Smart-Booker</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--light) 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .page-header h1 {
+            color: var(--primary-dark);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .page-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .passenger-list {
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        .passenger-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .passenger-table th {
+            background-color: var(--primary);
+            color: var(--white);
+            text-align: left;
+            padding: 15px 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .passenger-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--gray-light);
+            color: var(--gray-dark);
+        }
+        
+        .passenger-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .passenger-table tr {
+            transition: all 0.3s ease;
+        }
+        
+        .passenger-table tr:hover {
+            background-color: var(--light);
+        }
+        
+        .passenger-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .passenger-email {
+            color: var(--primary);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-view, .btn-edit, .btn-delete {
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-view {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+        
+        .btn-view:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-edit {
+            background-color: var(--secondary-light);
+            color: var(--secondary-dark);
+        }
+        
+        .btn-edit:hover {
+            background-color: var(--secondary);
+            color: var(--white);
+        }
+        
+        .btn-delete {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+        
+        .btn-delete:hover {
+            background-color: #dc3545;
+            color: var(--white);
+        }
+        
+        .add-passenger {
+            margin-top: 30px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            animation-delay: 0.3s;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        
+        .no-passengers {
+            text-align: center;
+            padding: 60px 30px;
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .no-passengers h2 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .no-passengers p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto 20px;
+        }
+        
+        .no-passengers-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: var(--gray-light);
+        }
+    </style>
+</head>
+<body>
+    <!-- Include the navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>Passenger Management</h1>
+        </div>
+        
+        <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+        <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+        
+        <div class="passenger-list" th:if="${not #lists.isEmpty(passengers)}">
+            <table class="passenger-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="passenger : ${passengers}">
+                        <td class="passenger-name" th:text="${passenger.firstName + ' ' + passenger.lastName}"></td>
+                        <td class="passenger-email" th:text="${passenger.email}"></td>
+                        <td th:text="${passenger.phoneNumber}"></td>
+                        <td>
+                            <div class="action-buttons">
+                                <a th:href="@{'/passengers/' + ${passenger.id()}}" class="btn-view">View</a>
+                                <a th:href="@{'/passengers/' + ${passenger.id()} + '/edit'}" class="btn-edit">Edit</a>
+                                <a th:href="@{'/bookings?passengerId=' + ${passenger.id()}}" class="btn">Bookings</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="no-passengers" th:if="${#lists.isEmpty(passengers)}">
+            <div class="no-passengers-icon">👤</div>
+            <h2>No Passengers Found</h2>
+            <p>There are no passengers in the system yet. Add your first passenger to get started.</p>
+            <a href="/passengers/new" class="btn">Add Passenger</a>
+        </div>
+        
+        <div class="add-passenger" th:if="${not #lists.isEmpty(passengers)}">
+            <a href="/passengers/new" class="btn">Add New Passenger</a>
+        </div>
+    </div>
+</body>
+</html>

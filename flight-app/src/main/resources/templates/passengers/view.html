@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passenger Details | Smart-Booker</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--light) 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .page-header h1 {
+            color: var(--primary-dark);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .page-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .passenger-card {
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+            animation: slideUp 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .passenger-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        }
+        
+        .passenger-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        
+        .passenger-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--light) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 30px;
+            color: var(--primary-dark);
+            font-weight: bold;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+        
+        .passenger-name {
+            flex: 1;
+        }
+        
+        .passenger-name h2 {
+            color: var(--dark);
+            font-size: 1.8rem;
+            margin: 0 0 5px;
+        }
+        
+        .passenger-name p {
+            color: var(--gray);
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        
+        .passenger-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .detail-group {
+            margin-bottom: 15px;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .detail-value {
+            font-size: 1.1rem;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            animation: fadeIn 0.8s ease-out;
+            animation-delay: 0.3s;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        
+        .btn-back {
+            background-color: var(--gray-light);
+            color: var(--gray-dark);
+        }
+        
+        .btn-back:hover {
+            background-color: var(--gray);
+            color: var(--white);
+        }
+        
+        .btn-edit {
+            background-color: var(--secondary);
+            color: var(--white);
+        }
+        
+        .btn-edit:hover {
+            background-color: var(--secondary-dark);
+        }
+        
+        .btn-delete {
+            background-color: #dc3545;
+            color: var(--white);
+        }
+        
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+        
+        @media (max-width: 768px) {
+            .passenger-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .passenger-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .passenger-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include the navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>Passenger Details</h1>
+        </div>
+        
+        <div class="passenger-card">
+            <div class="passenger-header">
+                <div class="passenger-avatar" th:text="${passenger.firstName.substring(0,1) + passenger.lastName.substring(0,1)}"></div>
+                <div class="passenger-name">
+                    <h2 th:text="${passenger.firstName + ' ' + passenger.lastName}"></h2>
+                    <p th:text="${passenger.email}"></p>
+                </div>
+            </div>
+            
+            <div class="passenger-details">
+                <div class="detail-group">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value" th:text="${passenger.email}"></div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Phone</div>
+                    <div class="detail-value" th:text="${passenger.phoneNumber}"></div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Date of Birth</div>
+                    <div class="detail-value" th:text="${#temporals.format(passenger.dateOfBirth, 'MMMM dd, yyyy')}"></div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Nationality</div>
+                    <div class="detail-value" th:text="${passenger.nationality}"></div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Passport Number</div>
+                    <div class="detail-value" th:text="${passenger.passportNumber}"></div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Passport Expiry</div>
+                    <div class="detail-value" th:text="${#temporals.format(passenger.passportExpiry, 'MMMM dd, yyyy')}"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="/passengers" class="btn btn-back">Back to List</a>
+            <a th:href="@{'/passengers/' + ${passenger.id()} + '/edit'}" class="btn btn-edit">Edit</a>
+            <form th:action="@{'/passengers/' + ${passenger.id()} + '/delete'}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this passenger?')">Delete</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Trip</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .alert-info {
+            background-color: #e9f7fe;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .booking-selection {
+            margin-top: 20px;
+        }
+        .booking-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .booking-details {
+            flex-grow: 1;
+            margin-left: 10px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #0066cc;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #0052a3;
+        }
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .no-bookings {
+            text-align: center;
+            padding: 30px;
+            background-color: #f2f2f2;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create New Trip</h1>
+        
+        <div class="alert alert-info">
+            <p>Select the bookings you want to include in your trip. You must select at least one booking.</p>
+        </div>
+        
+        <form th:if="${not #lists.isEmpty(bookings)}" action="/trips/create" method="post">
+            <input type="hidden" name="passengerId" th:value="${passengerId}">
+            
+            <div class="booking-selection">
+                <h2>Available Bookings</h2>
+                
+                <div class="booking-item" th:each="booking : ${bookings}" th:if="${booking.status() == 'CONFIRMED'}">
+                    <input type="checkbox" name="bookingReferences" th:value="${booking.bookingReference()}" th:id="${booking.bookingReference()}">
+                    <div class="booking-details">
+                        <label th:for="${booking.bookingReference()}">
+                            <strong th:text="${booking.flightNumber()}"></strong> - 
+                            <span th:text="'Seat: ' + ${booking.seatNumber()}"></span> - 
+                            <span th:text="'$' + ${booking.price()}"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <a th:href="@{/trips(passengerId=${passengerId})}" class="btn">Cancel</a>
+                <button type="submit" class="btn">Create Trip</button>
+            </div>
+        </form>
+        
+        <div class="no-bookings" th:if="${#lists.isEmpty(bookings) || !bookings.?[status() == 'CONFIRMED'].size()}">
+            <h2>No Bookings Available</h2>
+            <p>You don't have any confirmed bookings to create a trip. Please book flights first.</p>
+            <div class="form-actions">
+                <a href="/flights" class="btn">Search Flights</a>
+                <a href="/" class="btn">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Available Flights | Smart-Booker</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--light) 100%);
+            min-height: 100vh;
+        }
+        
+        .flights-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .flights-header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .flights-header h1 {
+            color: var(--primary-dark);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .flights-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .flights-header p {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .flights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .flight-card {
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .flight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .flight-header {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .flight-number {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .flight-price {
+            font-weight: 700;
+            font-size: 1.2rem;
+            background-color: var(--accent);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        
+        .flight-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .flight-route {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .flight-city {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .flight-city-code {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        
+        .flight-city-name {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            margin-top: 5px;
+        }
+        
+        .flight-arrow {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin: 0 15px;
+            position: relative;
+        }
+        
+        .flight-arrow::after {
+            content: '→';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .flight-details {
+            margin-top: 20px;
+            border-top: 1px solid var(--light);
+            padding-top: 20px;
+        }
+        
+        .flight-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .flight-detail-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .flight-detail-value {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+        
+        .flight-actions {
+            margin-top: auto;
+            padding: 15px 20px;
+            border-top: 1px solid var(--light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .flight-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+        
+        .flight-status.sold-out {
+            background-color: var(--danger-light);
+            color: var(--danger);
+        }
+        
+        .flight-button {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .flight-button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .no-flights {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .no-flights h2 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .no-flights p {
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .flights-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include the navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    
+    <div class="flights-container">
+        <div class="flights-header">
+            <h1>All Available Flights</h1>
+        </div>
+        
+        <div th:if="${flights != null && !flights.isEmpty()}" class="flights-grid">
+            <div th:each="flight : ${flights}" class="flight-card">
+                <div class="flight-header">
+                    <span class="flight-number" th:text="${flight.flightNumber()}"></span>
+                    <span class="flight-price" th:text="${'$' + flight.price()}"></span>
+                </div>
+                <div class="flight-body">
+                    <div class="flight-route">
+                        <div class="flight-city">
+                            <div class="flight-city-code" th:text="${flight.originCode()}"></div>
+                            <div class="flight-city-name" th:text="${flight.originCityName()}"></div>
+                        </div>
+                        <div class="flight-arrow"></div>
+                        <div class="flight-city">
+                            <div class="flight-city-code" th:text="${flight.destinationCode()}"></div>
+                            <div class="flight-city-name" th:text="${flight.destinationCityName()}"></div>
+                        </div>
+                    </div>
+                    <div class="flight-details">
+                        <div class="flight-detail">
+                            <span class="flight-detail-label">Departure</span>
+                            <span class="flight-detail-value" th:text="${#temporals.format(flight.departureTime(), 'MMM dd, yyyy HH:mm')}"></span>
+                        </div>
+                        <div class="flight-detail">
+                            <span class="flight-detail-label">Arrival</span>
+                            <span class="flight-detail-value" th:text="${#temporals.format(flight.arrivalTime(), 'MMM dd, yyyy HH:mm')}"></span>
+                        </div>
+                        <div class="flight-detail">
+                            <span class="flight-detail-label">Available Seats</span>
+                            <span class="flight-detail-value" th:text="${flight.availableSeats()}"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flight-actions">
+                    <span class="flight-status" th:classappend="${flight.availableSeats() > 0 ? '' : 'sold-out'}" 
+                          th:text="${flight.availableSeats() > 0 ? 'Available' : 'Sold Out'}"></span>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${flights == null || flights.isEmpty()}" class="no-flights">
+            <h2>No Flights Available</h2>
+            <p>There are currently no available flights. Please check back later or try different search criteria.</p>
+        </div>
+    </div>
+</body>
+</html>

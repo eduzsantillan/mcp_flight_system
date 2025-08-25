@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div th:fragment="navbar" class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <a href="/">Smart-Booker</a>
+            </div>
+            <div class="navbar-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/flights" class="nav-link">Flights</a>
+                <a href="/bookings" class="nav-link">My Bookings</a>
+                <a href="/passengers" class="nav-link">Passengers</a>
+            </div>
+        </div>
+        <style>
+            .navbar {
+                background-color: var(--primary-dark);
+                color: var(--white);
+                padding: 0;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                width: 100%;
+            }
+            
+            .navbar-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 20px;
+                height: 70px;
+            }
+            
+            .navbar-logo a {
+                color: var(--white);
+                font-size: 24px;
+                font-weight: 700;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                transition: var(--transition);
+            }
+            
+            .navbar-logo a:hover {
+                color: var(--accent);
+            }
+            
+            .navbar-logo a::before {
+                content: '✈️';
+                margin-right: 10px;
+                font-size: 24px;
+                animation: float 3s ease-in-out infinite;
+            }
+            
+            @keyframes float {
+                0% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-5px);
+                }
+                100% {
+                    transform: translateY(0px);
+                }
+            }
+            
+            .navbar-links {
+                display: flex;
+                gap: 20px;
+            }
+            
+            .nav-link {
+                color: var(--white);
+                text-decoration: none;
+                font-weight: 500;
+                padding: 8px 16px;
+                border-radius: var(--radius);
+                transition: var(--transition);
+                position: relative;
+            }
+            
+            .nav-link:hover {
+                background-color: rgba(255,255,255,0.1);
+            }
+            
+            .nav-link::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: 0;
+                left: 50%;
+                background-color: var(--accent);
+                transition: all 0.3s ease;
+                transform: translateX(-50%);
+            }
+            
+            .nav-link:hover::after {
+                width: 70%;
+            }
+            
+            @media (max-width: 768px) {
+                .navbar-container {
+                    flex-direction: column;
+                    height: auto;
+                    padding: 15px 20px;
+                }
+                
+                .navbar-logo {
+                    margin-bottom: 15px;
+                }
+                
+                .navbar-links {
+                    flex-direction: column;
+                    gap: 10px;
+                    width: 100%;
+                    text-align: center;
+                }
+                
+                .nav-link {
+                    display: block;
+                    padding: 10px;
+                }
+            }
+        </style>
+    </div>
+</body>
+</html>

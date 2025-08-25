@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Search Results | Smart-Booker</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--light) 100%);
+            min-height: 100vh;
+        }
+        
+        .results-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .results-header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .results-header h1 {
+            color: var(--primary-dark);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .results-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .search-summary {
+            background-color: var(--white);
+            padding: 20px 30px;
+            border-radius: var(--radius);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+            animation: slideUp 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .search-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(192, 214, 223, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+            z-index: 0;
+        }
+        
+        .search-summary p {
+            position: relative;
+            z-index: 1;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        
+        .search-summary strong {
+            color: var(--primary-dark);
+        }
+        
+        .search-summary span {
+            font-weight: 600;
+            color: var(--secondary-dark);
+        }
+        
+        .flights-count {
+            font-size: 1.2rem;
+            color: var(--gray-dark);
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 3px solid var(--accent);
+            animation: fadeIn 0.8s ease-out;
+            animation-delay: 0.2s;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        
+        .flight-list {
+            margin-top: 30px;
+        }
+        
+        .flight-card {
+            background-color: var(--white);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            transition: all 0.4s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+            animation-fill-mode: forwards;
+            opacity: 0;
+        }
+        
+        .flight-card:nth-child(1) { animation-delay: 0.1s; }
+        .flight-card:nth-child(2) { animation-delay: 0.2s; }
+        .flight-card:nth-child(3) { animation-delay: 0.3s; }
+        .flight-card:nth-child(4) { animation-delay: 0.4s; }
+        .flight-card:nth-child(5) { animation-delay: 0.5s; }
+        .flight-card:nth-child(n+6) { animation-delay: 0.6s; }
+        
+        .flight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .flight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .flight-card:hover::before {
+            opacity: 1;
+        }
+        
+        .flight-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .airline-logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--light) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 25px;
+            font-weight: bold;
+            color: var(--primary-dark);
+            font-size: 20px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .flight-card:hover .airline-logo {
+            transform: scale(1.05);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+        }
+        
+        .airline-logo::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+        
+        .flight-card:hover .airline-logo::after {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+        
+        .flight-details {
+            flex: 1;
+        }
+        
+        .flight-route {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .flight-city {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: 0.5px;
+        }
+        
+        .flight-time {
+            font-size: 18px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .flight-arrow {
+            margin: 0 20px;
+            color: var(--gray);
+            font-size: 24px;
+            position: relative;
+        }
+        
+        .flight-arrow::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -15px;
+            right: -15px;
+            height: 2px;
+            background-color: var(--gray-light);
+            z-index: 0;
+            transform: translateY(-50%);
+        }
+        
+        .flight-arrow::after {
+            content: '✈️';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            background-color: var(--white);
+            padding: 0 5px;
+            z-index: 1;
+            transition: all 0.5s ease;
+        }
+        
+        .flight-card:hover .flight-arrow::after {
+            transform: translate(-50%, -50%) translateX(20px);
+        }
+        
+        .flight-meta {
+            display: flex;
+            color: var(--gray);
+            font-size: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .flight-meta div {
+            margin-right: 25px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .flight-meta div::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-light);
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .flight-price {
+            text-align: right;
+            padding-left: 30px;
+            border-left: 1px dashed var(--gray-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .price-amount {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .price-amount::before {
+            content: 'from';
+            position: absolute;
+            top: -15px;
+            left: 0;
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--gray);
+        }
+        
+        .reserve-btn {
+            background: linear-gradient(135deg, var(--success) 0%, #4a7a6c 100%);
+            color: var(--white);
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(107, 144, 128, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .reserve-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: all 0.6s ease;
+        }
+        
+        .reserve-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(107, 144, 128, 0.4);
+        }
+        
+        .reserve-btn:hover::before {
+            left: 100%;
+        }
+        
+        .no-flights {
+            text-align: center;
+            padding: 60px 30px;
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .no-flights h2 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .no-flights p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .no-flights-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: var(--gray-light);
+        }
+        
+        .nav-links {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            animation: fadeIn 0.8s ease-out;
+            animation-delay: 0.6s;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        
+        .nav-links .btn {
+            margin: 0 10px;
+            min-width: 150px;
+        }
+        
+        @media (max-width: 768px) {
+            .flight-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .flight-info {
+                margin-bottom: 20px;
+            }
+            
+            .flight-price {
+                border-left: none;
+                border-top: 1px dashed var(--gray-light);
+                padding-left: 0;
+                padding-top: 20px;
+                text-align: center;
+            }
+            
+            .flight-route {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .flight-arrow {
+                align-self: center;
+                margin: 10px 0;
+                transform: rotate(90deg);
+            }
+            
+            .flight-arrow::before {
+                left: -30px;
+                right: -30px;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include the navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    
+    <div class="results-container">
+        <div class="results-header">
+            <h1>Flight Search Results</h1>
+        </div>
+        
+        <div class="search-summary">
+            <p>
+                <strong>Search Criteria:</strong> All flights from <span th:text="${origin}"></span> to <span th:text="${destination}"></span>
+            </p>
+        </div>
+        
+        <div class="flight-list" th:if="${not #lists.isEmpty(flights)}">
+            <div class="flights-count" th:text="${flights.size()} + ' Flights Found'"></div>
+            
+            <div class="flight-card" th:each="flight : ${flights}">
+                <div class="flight-info">
+                    <div class="airline-logo" th:text="${flight.airline.substring(0,2)}"></div>
+                    <div class="flight-details">
+                        <div class="flight-route">
+                            <div>
+                                <div class="flight-city" th:text="${flight.originCode}"></div>
+                                <div class="flight-time" th:text="${#temporals.format(flight.departureTime, 'HH:mm')}"></div>
+                            </div>
+                            <div class="flight-arrow">→</div>
+                            <div>
+                                <div class="flight-city" th:text="${flight.destinationCode}"></div>
+                                <div class="flight-time" th:text="${#temporals.format(flight.arrivalTime, 'HH:mm')}"></div>
+                            </div>
+                        </div>
+                        <div class="flight-meta">
+                            <div>
+                                <span th:text="${flight.airline} + ' ' + ${flight.flightNumber}"></span>
+                            </div>
+                            <div>
+                                <span th:text="${#temporals.format(flight.departureTime, 'MMM dd')}"></span>
+                            </div>
+                            <div>
+                                <span th:text="${flight.availableSeats} + ' seats available'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flight-price">
+                    <div class="price-amount" th:text="'$' + ${flight.price}"></div>
+                    <a th:href="@{'/seats/select/' + ${flight.flightNumber}}" class="reserve-btn">Select Seats</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="no-flights" th:if="${#lists.isEmpty(flights)}">
+            <div class="no-flights-icon">🔍</div>
+            <h2>No Flights Found</h2>
+            <p>Sorry, no flights match your search criteria. Please try different destinations.</p>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/" class="btn">New Search</a>
+        </div>
+    </div>
+</body>
+</html>
