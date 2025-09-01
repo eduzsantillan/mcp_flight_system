@@ -10,12 +10,8 @@ This repository contains the flight management system with MCP (Model Context Pr
 
 ## MCP
 
-```markdown
 ![](./assets/mcp.png)
-```
 
 ## Agentic Workflow
 
-```markdown
 ![](./assets/router_workflow.png)
-```
