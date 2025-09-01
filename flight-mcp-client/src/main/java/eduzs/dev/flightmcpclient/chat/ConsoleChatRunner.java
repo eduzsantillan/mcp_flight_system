@@ -13,18 +13,15 @@ import java.io.InputStreamReader;
 @Component
 public class ConsoleChatRunner implements CommandLineRunner {
 
-    private final ChatClient chatClient;
+    private final RoutingWorkflow routerWorkflow;
 
-    public ConsoleChatRunner(ChatClient.Builder chatClientBuilder, ToolCallbackProvider tools) {
-        this.chatClient = chatClientBuilder
-                .defaultToolCallbacks(tools)
-                .build();
-
+    public ConsoleChatRunner(RoutingWorkflow routerWorkflow) {
+        this.routerWorkflow = routerWorkflow;
     }
 
     @Override
     public void run(String... args) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        var reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Type 'exit' to quit.");
         String context = "";
         while (true) {
@@ -32,7 +29,6 @@ public class ConsoleChatRunner implements CommandLineRunner {
             String line = reader.readLine();
             if (line == null) break;
             if (line.trim().equalsIgnoreCase("exit")) break;
-            var routerWorkflow = new RoutingWorkflow(chatClient);
             String resp = routerWorkflow.route(line, context);
             context = resp;
             System.out.println(resp);
